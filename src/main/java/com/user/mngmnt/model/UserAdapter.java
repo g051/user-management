@@ -14,11 +14,9 @@ public class UserAdapter implements UserDetails {
     private User user;
 
 
-
     public UserAdapter(User user) {
         this.user = user;
     }
-
 
 
     @Override
@@ -29,19 +27,16 @@ public class UserAdapter implements UserDetails {
     }
 
 
-
     @Override
     public String getPassword() {
         return user.getPassword();
     }
 
 
-
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getUserName();
     }
-
 
 
     @Override
@@ -50,12 +45,10 @@ public class UserAdapter implements UserDetails {
     }
 
 
-
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
 
 
     @Override
@@ -64,12 +57,10 @@ public class UserAdapter implements UserDetails {
     }
 
 
-
     @Override
     public boolean isEnabled() {
         return true;
     }
-
 
 
     @Override
@@ -78,11 +69,10 @@ public class UserAdapter implements UserDetails {
     }
 
 
-
     @Override
     public boolean equals(Object obj) {
         UserAdapter other = (UserAdapter) obj;
-        return user.getEmail().equals(other.user.getEmail());
+        return user.getUserName().equals(other.user.getUserName());
     }
 
 }

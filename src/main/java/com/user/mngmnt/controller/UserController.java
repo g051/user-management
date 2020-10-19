@@ -53,13 +53,13 @@ public class UserController {
         ModelAndView modelAndView = new ModelAndView();
         if (list.contains(RoleNames.ADMIN.name())) {
             modelAndView.setViewName("home");
-            Page<User> allUsers = userService.listUsers(PageRequest.of(page, size, Sort.by("firstName")));
+            Page<User> allUsers = userService.listUsers(PageRequest.of(page, size, Sort.by("userName")));
             modelAndView.addObject("allUsers", allUsers);
             modelAndView.addObject("maxTraySize", size);
             modelAndView.addObject("currentPage", page);
         } else {
             modelAndView.setViewName("user-home");
-            User user = userService.findUserByEmail(request.getUserPrincipal().getName());
+            User user = userService.findUserByUserName(request.getUserPrincipal().getName());
             modelAndView.addObject("currentUser", user);
         }
 
@@ -74,7 +74,7 @@ public class UserController {
                                      @RequestParam(value = "searchTerm", required = false) String searchTerm) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("home");
-        Page<User> allUsers = userService.searchByTerm(searchTerm.trim(), PageRequest.of(page, size, Sort.by("firstName")));
+        Page<User> allUsers = userService.searchByTerm(searchTerm.trim(), PageRequest.of(page, size, Sort.by("userName")));
         modelAndView.addObject("allUsers", allUsers);
         modelAndView.addObject("maxTraySize", size);
         modelAndView.addObject("currentPage", page);
@@ -116,8 +116,10 @@ public class UserController {
     @PostMapping("/save")
     public Response update(@RequestBody User user) {
         User dbUser = userService.findById(user.getId());
+        //dbUser.setUserName(user.getUserName());
         dbUser.setFirstName(user.getFirstName());
         dbUser.setLastName(user.getLastName());
+        dbUser.setEmail(user.getEmail());
         userService.saveUser(dbUser);
         return new Response(302, AppConstant.SUCCESS, "/");
     }
@@ -127,8 +129,10 @@ public class UserController {
     @PostMapping("/register")
     public String register(@ModelAttribute User user) {
         String result = "redirect:/";
-        User dbUser = userService.findUserByEmail(user.getEmail());
-        if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
+        User dbUser = userService.findUserByUserName(user.getUserName());
+        if (user.getUserName() == null || user.getUserName().trim().isEmpty()) {
+            result = "redirect:/addNewUser?error=Enter valid username";
+        } else if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
             result = "redirect:/addNewUser?error=Enter valid fist name";
         } else if (user.getLastName() == null || user.getLastName().trim().isEmpty()) {
             result = "redirect:/addNewUser?error=Enter valid last name";

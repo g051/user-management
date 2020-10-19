@@ -1,6 +1,7 @@
 package com.user.mngmnt.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 @AutoConfigureWebMvc
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+	@Qualifier("customUserDetailsService")
 	@Autowired
 	private UserDetailsService userDetailsService;
 

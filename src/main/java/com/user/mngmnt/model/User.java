@@ -16,6 +16,9 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "userName")
+    private String userName;
+
     @Column(name = "firstName")
     private String firstName;
 
@@ -35,13 +38,13 @@ public class User {
     private boolean isActive;
 
 
-
     public User() {
     }
 
 
-
-    public User(String pFirstName, String pLastName, String pEmail, String pPassword, String pRoleName, boolean pIsActive) {
+    public User(String pUserName, String pFirstName, String pLastName,
+                String pEmail, String pPassword, String pRoleName, boolean pIsActive) {
+        userName = pUserName;
         firstName = pFirstName;
         lastName = pLastName;
         email = pEmail;
@@ -51,23 +54,26 @@ public class User {
     }
 
 
-
     public Long getId() {
         return id;
     }
-
 
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public String getUserName() {
+        return userName;
+    }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public String getFirstName() {
         return firstName;
     }
-
 
 
     public void setFirstName(String firstName) {
@@ -75,11 +81,9 @@ public class User {
     }
 
 
-
     public String getLastName() {
         return lastName;
     }
-
 
 
     public void setLastName(String lastName) {
@@ -87,11 +91,9 @@ public class User {
     }
 
 
-
     public String getEmail() {
         return email;
     }
-
 
 
     public void setEmail(String email) {
@@ -99,11 +101,9 @@ public class User {
     }
 
 
-
     public String getPassword() {
         return password;
     }
-
 
 
     public void setPassword(String password) {
@@ -111,11 +111,9 @@ public class User {
     }
 
 
-
     public String getRoleName() {
         return roleName;
     }
-
 
 
     public void setRoleName(String roleName) {
@@ -123,15 +121,25 @@ public class User {
     }
 
 
-
     public boolean isActive() {
         return isActive;
     }
-
 
 
     public void setActive(boolean isActive) {
         this.isActive = isActive;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", roleName='" + roleName + '\'' +
+                ", isActive=" + isActive +
+                '}';
+    }
 }

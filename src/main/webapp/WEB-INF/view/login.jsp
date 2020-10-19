@@ -34,8 +34,11 @@
                                 </c:otherwise>
                             </c:choose>
                             <div class="form-group">
-                                <label for="email">E-Mail Address</label>
+                                <!--label for="email">E-Mail Address</label>
                                 <input id="email" type="email" class="form-control" name="username" value="" required
+                                       autofocus-->
+                                <label for="username">Username</label>
+                                <input id="username" type="username" class="form-control" name="username" value="" required
                                        autofocus>
                             </div>
 

@@ -21,13 +21,18 @@
                         <form action="/register" method="POST">
 
                             <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <input id="firstName" type="text" class="form-control" name="firstName" required
+                                <label for="UserName">Username</label>
+                                <input id="userName" type="text" class="form-control" name="userName" required
                                        autofocus>
                             </div>
 
                             <div class="form-group">
-                                <label for="lastName">First Name</label>
+                                <label for="firstName">First Name</label>
+                                <input id="firstName" type="text" class="form-control" name="firstName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
                                 <input id="lastName" type="text" class="form-control" name="lastName" required>
                             </div>
 

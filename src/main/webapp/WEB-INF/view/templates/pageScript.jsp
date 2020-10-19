@@ -3,8 +3,13 @@
 <script>
     function saveData(id) {
         console.log('save Data -  ' + id)
+        var email = $('#text_email_' + id).val();
         var fname = $('#text_fname_' + id).val();
         var lname = $('#text_lname_' + id).val();
+        if (email == "") {
+            $('#text_email_' + id).css('border-color', 'red');
+            return;
+        }
         if (fname == "") {
             $('#text_fname_' + id).css('border-color', 'red');
             return;
@@ -20,6 +25,7 @@
             dataType: "json",
             data: JSON.stringify({
                 id: id,
+                email: email,
                 firstName: fname,
                 lastName: lname
             }),

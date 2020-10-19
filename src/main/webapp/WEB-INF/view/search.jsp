@@ -25,6 +25,7 @@
                             </td>
                             <td>
                                 <select id="criteriaId" name="criteria" class="form-control">
+                                    <option value="userName">Username</option>
                                     <option value="firstName">First Name</option>
                                     <option value="lastName">Last Name</option>
                                     <option value="email">Email</option>
@@ -55,40 +56,36 @@
                             <thead>
                             <tr>
                                 <th>User Id</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Active?</th>
+                                <th>Email</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
-                                <th>Email</th>
                                 <th colspan="2">Action</th>
                             </tr>
                             </thead>
                             <tbody>
                             <c:forEach var="user" items="${result}">
                                 <tr>
+                                    <td><label>${user.getId()}</label></td>
+                                    <td><label>${user.getUserName()}</label></td>
+                                    <td><label>${user.getRoleName()}</label></td>
+                                    <td><label>${user.isActive()}</label></td>
                                     <td>
-                                        <label>${user.getId()}</label>
+                                        <label id="email_${user.getId()}">${user.getEmail()}</label>
+                                        <input required type="text" class="form-control" style="display:none;"
+                                               name="email" value="${user.getEmail()}" id="text_email_${user.getId()}">
                                     </td>
                                     <td>
-                                        <label id="fname_${user.getId()}">
-                                                ${user.getFirstName()}
-                                        </label>
-                                        <input required type="text" name="firstName" class="form-control"
-                                               value="${user.getFirstName()}"
-                                               style="display: none;"
-                                               id="text_fname_${user.getId()}">
+                                        <label id="fname_${user.getId()}">${user.getFirstName()}</label>
+                                        <input required type="text" class="form-control" style="display:none;"
+                                               name="firstName" value="${user.getFirstName()}" id="text_fname_${user.getId()}">
                                     </td>
                                     <td>
-                                        <label id="lname_${user.getId()}">
-                                                ${user.getLastName()}
-                                        </label>
-                                        <input required class="form-control" type="text" name="firstName"
-                                               value="${user.getLastName()}"
-                                               style="display: none;"
-                                               id="text_lname_${user.getId()}">
-                                    </td>
-                                    <td>
-                                        <label>
-                                                ${user.getEmail()}
-                                        </label>
+                                        <label id="lname_${user.getId()}">${user.getLastName()}</label>
+                                        <input required type="text" class="form-control" style="display:none;"
+                                               name="lastName" value="${user.getLastName()}" id="text_lname_${user.getId()}">
                                     </td>
                                     <td>
                                         <a href="/update" id="update_${user.getId()}" class="updateData"
@@ -97,8 +94,9 @@
                                            onclick="event.preventDefault();saveData(${user.getId()});"
                                            style="display: none;"><i class="fa fa-save"></i></a>
                                     </td>
-                                    <td><a href="/delete/${user.getId()}" class="deleteData"><i class="fa fa-trash"></i></a>
-                                    </td>
+                                    <td><a href="/delete/${user.getId()}" class="deleteData">
+                                        <i class="fa fa-trash"></i>
+                                    </a></td>
                                 </tr>
                             </c:forEach>
                             </tbody>

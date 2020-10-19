@@ -2,23 +2,22 @@ package com.user.mngmnt.dto;
 
 public class LoginDTO {
 
-	private String emailAddrss;
-	private String pswd;
+	private String username;
+	private String password;
 
-	public String getEmailAddrss() {
-		return emailAddrss;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setEmailAddrss(String emailAddrss) {
-		this.emailAddrss = emailAddrss;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getPswd() {
-		return pswd;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPswd(String pswd) {
-		this.pswd = pswd;
+	public void setPassword(String password) {
+		this.password = password;
 	}
-
 }

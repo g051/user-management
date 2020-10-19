@@ -15,27 +15,30 @@ public class InitialSetup {
     @Autowired
     private UserService userService;
 
-    @Value("${admin.first.name}")
+    @Value("${admin.username}")
+    private String userName;
+
+    @Value("0")
     private String firstName;
 
-    @Value("${admin.last.name}")
+    @Value("Administrator")
     private String lastName;
 
-    @Value("${admin.email.address}")
+    @Value("adm1n@yopmail.com")
     private String emailAddress;
 
     @Value("${admin.password}")
     private String password;
 
-
-
     @PostConstruct
     public void initIt() throws Exception {
 
-        User dbUser = userService.findUserByEmail(emailAddress);
+        //User dbUser = userService.findUserByEmail(emailAddress);
+        User dbUser = userService.findUserByUserName(userName);
 
         if (dbUser == null) {
             User user = new User();
+            user.setUserName(userName);
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setEmail(emailAddress);
@@ -50,44 +53,16 @@ public class InitialSetup {
 
 
     private void loadUsers() {
-        User user1 = new User("john", "doe",
-                "john@doe.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
+        User user1 = new User("user1", "1", "User",
+                "user1@yopmail.com", "123456", RoleNames.USER.name(), Boolean.TRUE);
         userService.saveUser(user1);
 
-        User user2 = new User("Smith", "Guard",
-                "smith@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
+        User user2 = new User("user2", "2", "User",
+                "user2@yopmail.com", "123456", RoleNames.USER.name(), Boolean.TRUE);
         userService.saveUser(user2);
 
-        User user3 = new User("Lannister", "Jammy",
-                "jammy@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
+        User user3 = new User("user2", "3", "User",
+                "user3@yopmail.com", "123456", RoleNames.USER.name(), Boolean.TRUE);
         userService.saveUser(user3);
-
-        User user4 = new User("Stark", "Arya",
-                "arya@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user4);
-
-        User user5 = new User("Bolton", "ramsay",
-                "ramsay@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user5);
-
-        User user6 = new User("Clarke", "gibbins",
-                "clarke@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user6);
-
-        User user7 = new User("Bob", "Marley",
-                "Bob@doe.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user7);
-
-        User user8 = new User("Octavia", "Marley",
-                "octavia@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user8);
-
-        User user9 = new User("Kane", "William",
-                "Kane@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user9);
-
-        User user10 = new User("Jon", "snow",
-                "jonsnow@gmail.com", "123456", RoleNames.ADMIN.name(), Boolean.TRUE);
-        userService.saveUser(user10);
     }
 }
