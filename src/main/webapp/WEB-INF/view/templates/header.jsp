@@ -26,10 +26,15 @@
                 <a class="nav-link" href="/addNewUser">Add User</a>
             </li>
         </ul>
-        <div >
-            <a style="text-align: right; color: #fff;" href="<c:url value="logout" />">Logout <i class="fa fa-sign-out fa-lg"></i>
-
-            </a>
+        <div>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a style="padding-right: 20px; color: #fff;" href="/updatePwd">Update Password</a>
+                </li>
+                <li class="nav-item active">
+                    <a style="text-align: right; color: #fff;" href="<c:url value="logout" />">Logout <i class="fa fa-sign-out fa-lg"></i></a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>

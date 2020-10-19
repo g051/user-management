@@ -11,16 +11,46 @@
     <div class="container ">
         <div class="row justify-content-md-center">
             <div class="card">
-                <div class="card-header">
-                    <h4 class="text-center">Only Admins can Perform operations</h4>
-                </div>
                 <div class="card card-body table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>User Id</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Active?</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><label>${currentUser.id}</label></td>
+                            <td><label>${currentUser.userName}</label></td>
+                            <td><label>${currentUser.roleName}</label></td>
+                            <td><label>${currentUser.active}</label></td>
+                            <td>
+                                <label id="email_${currentUser.id}">${currentUser.email}</label>
+                                <input required type="text" class="form-control" style="display:none;"
+                                       name="email" value="${currentUser.email}" id="text_email_${currentUser.id}">
+                            </td>
+                            <td>
+                                <a href="/update" id="update_${currentUser.id}" class="updateData"
+                                   onclick="event.preventDefault();"><i class="fa fa-edit"></i></a>
+                                <a href="/save" id="save_${currentUser.id}" class="saveData"
+                                   onclick="event.preventDefault();saveData(${currentUser.id});"
+                                   style="display: none;"><i class="fa fa-save"></i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+
                 </div>
             </div>
-            <jsp:include page="templates/copyright.jsp"/>
         </div>
     </div>
 </section>
-<jsp:include page="templates/footer.jsp"/>
+<jsp:include page="templates/pageScript.jsp"/>
 </body>
 </html>

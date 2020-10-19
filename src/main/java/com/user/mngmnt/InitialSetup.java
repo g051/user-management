@@ -18,13 +18,13 @@ public class InitialSetup {
     @Value("${admin.username}")
     private String userName;
 
-    @Value("0")
+    @Value("${admin.first.name}")
     private String firstName;
 
-    @Value("Administrator")
+    @Value("${admin.last.name}")
     private String lastName;
 
-    @Value("adm1n@yopmail.com")
+    @Value("${admin.email.address}")
     private String emailAddress;
 
     @Value("${admin.password}")
@@ -61,7 +61,7 @@ public class InitialSetup {
                 "user2@yopmail.com", "123456", RoleNames.USER.name(), Boolean.TRUE);
         userService.saveUser(user2);
 
-        User user3 = new User("user2", "3", "User",
+        User user3 = new User("user3", "3", "User",
                 "user3@yopmail.com", "123456", RoleNames.USER.name(), Boolean.TRUE);
         userService.saveUser(user3);
     }

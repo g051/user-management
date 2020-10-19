@@ -3,6 +3,7 @@ package com.user.mngmnt.controller;
 import com.user.mngmnt.constants.AppConstant;
 import com.user.mngmnt.dto.Response;
 import com.user.mngmnt.dto.SearchDTO;
+import com.user.mngmnt.model.Password;
 import com.user.mngmnt.model.RoleNames;
 import com.user.mngmnt.model.User;
 import com.user.mngmnt.service.UserService;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sound.midi.Soundbank;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,13 +61,13 @@ public class UserController {
             modelAndView.addObject("currentPage", page);
         } else {
             modelAndView.setViewName("user-home");
-            User user = userService.findUserByUserName(request.getUserPrincipal().getName());
-            modelAndView.addObject("currentUser", user);
         }
+        User user = userService.findUserByUserName(request.getUserPrincipal().getName());
+        modelAndView.addObject("currentUser", user);
+        request.getSession().setAttribute("currentUser", user);
 
         return modelAndView;
     }
-
 
 
     @GetMapping("/searchBox")
@@ -82,14 +84,12 @@ public class UserController {
     }
 
 
-
     @GetMapping("/search")
     public ModelAndView search() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("search");
         return modelAndView;
     }
-
 
 
     @PostMapping("/searchSubmit")
@@ -102,14 +102,12 @@ public class UserController {
     }
 
 
-
     @GetMapping("/addNewUser")
     public ModelAndView addNewUser() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("create-user");
         return modelAndView;
     }
-
 
 
     @ResponseBody
@@ -132,10 +130,6 @@ public class UserController {
         User dbUser = userService.findUserByUserName(user.getUserName());
         if (user.getUserName() == null || user.getUserName().trim().isEmpty()) {
             result = "redirect:/addNewUser?error=Enter valid username";
-        } else if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
-            result = "redirect:/addNewUser?error=Enter valid fist name";
-        } else if (user.getLastName() == null || user.getLastName().trim().isEmpty()) {
-            result = "redirect:/addNewUser?error=Enter valid last name";
         } else if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             result = "redirect:/addNewUser?error=Enter valid email";
         } else if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
@@ -153,7 +147,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/delete/{userId}")
     public String delete(@PathVariable Long userId) {
         userService.removeById(userId);
@@ -161,13 +154,46 @@ public class UserController {
     }
 
 
+    @GetMapping("/resetPwd/{userId}")
+    public String resetPwd(@PathVariable Long userId) {
+        userService.resetPassword(userId);
+        return "redirect:/";
+    }
+
+    @GetMapping("/updatePwd")
+    public ModelAndView updatePassword() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("update-password");
+        return modelAndView;
+    }
+
+    @PostMapping("/setNewPassword")
+    public String setNewPassword(@ModelAttribute Password pwdObj) {
+        String result = "redirect:/";
+
+        String userName = pwdObj.getUserName();
+        String oldPwd = pwdObj.getOldPwd();
+        String newPwd = pwdObj.getNewPwd();
+        System.out.println("setNewPassword: userName="+userName+", oldPwd="+oldPwd+", newPwd="+newPwd);
+
+        if (isNullOrEmpty(userName)) {
+            result = "redirect:/updatePwd?error=Enter valid username";
+        } else if (isNullOrEmpty(oldPwd)) {
+            result = "redirect:/updatePwd?error=Enter valid existing password";
+        } else if (isNullOrEmpty(newPwd)) {
+            result = "redirect:/updatePwd?error=Enter valid new password";
+        } else {
+            userService.updatePassword(userName, oldPwd, newPwd);
+        }
+
+        return result;
+    }
 
     @ResponseBody
     @GetMapping("/removeAll")
     public Boolean removeAll() {
         return userService.removeAll();
     }
-
 
 
     @GetMapping("/403")
@@ -178,7 +204,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/error")
     public ModelAndView error() {
         ModelAndView modelAndView = new ModelAndView();
@@ -186,4 +211,7 @@ public class UserController {
         return modelAndView;
     }
 
+    private boolean isNullOrEmpty(String in) {
+        return (in==null || in.trim().isEmpty());
+    }
 }

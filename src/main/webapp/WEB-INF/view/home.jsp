@@ -39,9 +39,7 @@
                                     <th>Role</th>
                                     <th>Active?</th>
                                     <th>Email</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th colspan="2">Action</th>
+                                    <th colspan="3">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -57,22 +55,15 @@
                                                    name="email" value="${user.getEmail()}" id="text_email_${user.getId()}">
                                         </td>
                                         <td>
-                                            <label id="fname_${user.getId()}">${user.getFirstName()}</label>
-                                            <input required type="text" class="form-control" style="display:none;"
-                                                   name="firstName" value="${user.getFirstName()}" id="text_fname_${user.getId()}">
-                                        </td>
-                                        <td>
-                                            <label id="lname_${user.getId()}">${user.getLastName()}</label>
-                                            <input required type="text" class="form-control" style="display:none;"
-                                                   name="lastName" value="${user.getLastName()}" id="text_lname_${user.getId()}">
-                                        </td>
-                                        <td>
                                             <a href="/update" id="update_${user.getId()}" class="updateData"
                                                onclick="event.preventDefault();"><i class="fa fa-edit"></i></a>
                                             <a href="/save" id="save_${user.getId()}" class="saveData"
                                                onclick="event.preventDefault();saveData(${user.getId()});"
                                                style="display: none;"><i class="fa fa-save"></i></a>
                                         </td>
+                                        <td><a href="/resetPwd/${user.getId()}" class="resetData">
+                                            <i class="fa fa-key"></i>
+                                        </a></td>
                                         <td><a href="/delete/${user.getId()}" class="deleteData">
                                             <i class="fa fa-trash"></i>
                                         </a></td>
@@ -114,45 +105,7 @@
                 </nav>
             </c:if>
 
-            <%--<nav aria-label="Page navigation example" style="margin:auto;">
-                <ul class="pagination">
-                    <li class="page-item"><a href="/prev/${currentPage-1}" class="page-link pageClickEvent">Previous</a>
-                    </li>
-                    <c:choose>
-                        <c:when test="${totalPages gt maxTraySize}">
-                            <c:set var="upperLimit" value="${totalPages - maxTraySize}"></c:set>
-                            <c:choose>
-                                <c:when test="${upperLimit gt maxTraySize}">
-                                    <c:forEach var="page" begin="${currentPage}" end="${currentPage + maxTraySize - 1}">
-                                        <li class="page-item"><a href="/page/${page}"
-                                                                 class="page-link pageClickEvent">${page}</a></li>
-                                    </c:forEach>
-                                    <li class="page-item"><a href="/next/${currentPage+1}"
-                                                             class="page-link pageClickEvent">Next</a></li>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:forEach var="page" begin="${currentPage}" end="${currentPage + upperLimit}">
-                                        <li class="page-item"><a href="/page/${page}"
-                                                                 class="page-link pageClickEvent">${page}</a></li>
-                                    </c:forEach>
-                                    <li class="page-item"><a href="/next/${currentPage+1}"
-                                                             class="page-link pageClickEvent">Next</a></li>
-                                </c:otherwise>
-                            </c:choose>
-                            <c:if test="${upperLimit gt maxTraySize}">
-                            </c:if>
-                        </c:when>
-                        <c:otherwise>
-                            <c:forEach var="page" begin="1" end="${totalPages}">
-                                <li class="page-item"><a href="/page/${page}"
-                                                         class="page-link pageClickEvent">${page}</a></li>
-                            </c:forEach>
-                        </c:otherwise>
-                    </c:choose>
-                </ul>
-                --%>
             <input type="hidden" name="currentPage" value="${currentPage}" id="currentPageNo">
-            <%--</nav>--%>
         </div>
     </div>
 </section>

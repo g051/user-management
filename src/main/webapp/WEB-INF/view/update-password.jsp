@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Create New User</title>
+    <title>Update Password</title>
 </head>
 
 <body class="my-login-page">
@@ -14,38 +14,33 @@
             <div class="card-wrapper">
                 <div class="card fat">
                     <div class="card-body">
-                        <h4 class="card-title">Create New User Form</h4>
+                        <h4 class="card-title">Update Password</h4>
                         <c:if test="${not empty param.error}">
                             <label id="error" class="alert alert-danger">${param.error}</label>
                         </c:if>
-                        <form action="/register" method="POST">
+                        <form action="/setNewPassword" method="POST">
 
                             <div class="form-group">
                                 <label for="UserName">Username</label>
-                                <input id="userName" type="text" class="form-control" name="userName" required
-                                       autofocus>
+                                <input id="userName" type="text" name="userName" value="${currentUser.userName}"
+                                       readonly class="form-control" style="font-weight: bold;">
                             </div>
 
                             <div class="form-group">
-                                <label for="email">E-Mail Address</label>
-                                <input id="email" type="email" class="form-control" name="email" required>
+                                <label for="oldPwd">Old Password</label>
+                                <input id="oldPwd" type="password" class="form-control" name="oldPwd"
+                                       required data-eye autofocus>
                             </div>
 
                             <div class="form-group">
-                                <label for="password">Password</label>
-                                <input id="password" type="password" class="form-control" name="password" required
-                                       data-eye>
-                            </div>
-                            <div class="form-group">
-                                <select id="criteriaId" name="roleName" class="custom-select form-control" required>
-                                    <option value="ADMIN">Admin</option>
-                                    <option value="USER">User</option>
-                                </select>
+                                <label for="newPwd">New Password</label>
+                                <input id="newPwd" type="password" class="form-control" name="newPwd"
+                                       required data-eye>
                             </div>
 
                             <div class="form-group no-margin">
                                 <button type="submit" class="btn btn-primary btn-block">
-                                    Create User
+                                    Update Password
                                 </button>
                             </div>
                         </form>

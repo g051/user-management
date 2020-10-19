@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
+    @Value("${user.password.default}")
+    private String defPwd;
+
     @Override
     public User findUserByUserName(String userName) {
         return userRepository.findByUserName(userName);
@@ -32,7 +36,6 @@ public class UserServiceImpl implements UserService {
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-
 
     @Override
     public void saveUser(User user) {
@@ -44,6 +47,28 @@ public class UserServiceImpl implements UserService {
         System.out.println("Save user: "+user);
     }
 
+    @Override
+    public void activateUser(String userName) {
+        User user = userRepository.findByUserName(userName);
+        user.setActive(Boolean.TRUE);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetPassword(Long id) {
+        User user = userRepository.findById(id).get();
+        user.setPassword(bCryptPasswordEncoder.encode(defPwd));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updatePassword(String userName, String oldPwd, String newPwd) {
+        User user = userRepository.findByUserName(userName);
+        if(user!=null && bCryptPasswordEncoder.matches(oldPwd, user.getPassword())) {
+            user.setPassword(bCryptPasswordEncoder.encode(newPwd));
+            userRepository.save(user);
+        }
+    }
 
     @Override
     public Page<User> listUsers(Pageable pageable) {

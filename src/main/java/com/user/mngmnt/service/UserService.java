@@ -14,6 +14,12 @@ public interface UserService {
 
     void saveUser(User user);
 
+    void activateUser(String userName);
+
+    void resetPassword(Long id);
+
+    void updatePassword(String userName, String oldPwd, String newPwd);
+
     Boolean removeAll();
 
     void removeById(Long id);
