@@ -234,7 +234,7 @@ public class UserController {
 
     @GetMapping("/resetPwd/{userId}")
     public String resetPwd(@PathVariable Long userId) {
-        userService.resetPassword(userId);
+        //userService.resetPassword(userId);
         addAudit(Actions.FORGOT_PWD, ActionStatus.SUCCESS,
                 userService.findUserNameByID(userId), "Reset password via email.");
 
@@ -274,6 +274,26 @@ public class UserController {
         }
 
         return result;
+    }
+
+    @GetMapping("/forgotPwd")
+    public ModelAndView forgotPwd() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("forgot-password");
+        return modelAndView;
+    }
+
+    @PostMapping("/forgotPwd2")
+    public String forgotPwd2(@ModelAttribute LoginDTO loginDto) {
+        String username = loginDto.getUsername();
+        User user = userService.findUserByUserName(username);
+        if(user!=null) {
+            addAudit(Actions.FORGOT_PWD, ActionStatus.SUCCESS,
+                    username, "Reset password via email.");
+            eventPublisher.publishEvent(
+                    new OnRegistrationCompleteEvent(user, ""));
+        }
+        return "redirect:/login";
     }
 
     @ResponseBody

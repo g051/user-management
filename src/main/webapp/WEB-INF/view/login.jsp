@@ -34,9 +34,6 @@
                                 </c:otherwise>
                             </c:choose>
                             <div class="form-group">
-                                <!--label for="email">E-Mail Address</label>
-                                <input id="email" type="email" class="form-control" name="username" value="" required
-                                       autofocus-->
                                 <label for="username">Username</label>
                                 <input id="username" type="username" class="form-control" name="username" value="" required
                                        autofocus>
@@ -51,7 +48,9 @@
                             <div class="form-group no-margin">
                                 <button id="loginSubmit" type="submit" class="btn btn-primary btn-block">Login</button>
                             </div>
-
+                            <div style="text-align: right;">
+                                <a class="nav-link" href="/forgotPwd">Forgot Password</a>
+                            </div>
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                         </form>
                     </div>

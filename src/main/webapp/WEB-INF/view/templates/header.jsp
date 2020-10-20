@@ -17,6 +17,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
+    <c:if test="${currentUser != null}">
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
@@ -43,4 +44,5 @@
             </ul>
         </div>
     </div>
+    </c:if>
 </nav>
