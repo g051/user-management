@@ -1,6 +1,7 @@
 package com.user.mngmnt.service;
 
 import com.user.mngmnt.model.User;
+import com.user.mngmnt.model.VerificationToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +15,7 @@ public interface UserService {
 
     void saveUser(User user);
 
-    void activateUser(String userName);
+    void activateUser(String username, String password);
 
     void resetPassword(Long id);
 
@@ -33,4 +34,8 @@ public interface UserService {
     Page<User> listUsers(Pageable pageable);
 
     List<User> searchBy(String keyword, String criteria);
+
+    void createVerificationToken(User user, String token);
+
+    VerificationToken getVerificationToken(String VerificationToken);
 }

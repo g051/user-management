@@ -125,9 +125,8 @@ public class User {
         return isActive;
     }
 
-
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     @Override

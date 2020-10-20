@@ -1,13 +1,18 @@
 package com.user.mngmnt.controller;
 
 import com.user.mngmnt.constants.AppConstant;
+import com.user.mngmnt.dto.LoginDTO;
 import com.user.mngmnt.dto.Response;
 import com.user.mngmnt.dto.SearchDTO;
 import com.user.mngmnt.model.*;
 import com.user.mngmnt.service.AuditService;
+import com.user.mngmnt.service.OnRegistrationCompleteEvent;
 import com.user.mngmnt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,9 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class UserController {
@@ -35,6 +39,9 @@ public class UserController {
 
     @Autowired
     private AuditService auditService;
+
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
 
     @Value("${max.result.per.page}")
     private int maxResults;
@@ -151,7 +158,7 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(@ModelAttribute User user) {
+    public String register(@ModelAttribute User user, HttpServletRequest request) {
         String result = "redirect:/";
         User dbUser = userService.findUserByUserName(user.getUserName());
         if (user.getUserName() == null || user.getUserName().trim().isEmpty()) {
@@ -167,11 +174,50 @@ public class UserController {
             userService.saveUser(user);
             addAudit(Actions.RESISTER, ActionStatus.SUCCESS,
                     user.getUserName(), "Register new user account.");
+
+            // Generate event to send activation email.
+            String appUrl = request.getContextPath();
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl));
         } else {
             result = "redirect:/addNewUser?error=User Already Exists!";
         }
 
         return result;
+    }
+
+    @GetMapping("/registrationConfirm")
+    public ModelAndView confirmRegistration(@RequestParam("token") String token) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("activate-user");
+
+        VerificationToken verificationToken = userService.getVerificationToken(token);
+        if (verificationToken == null) {
+            addAudit(Actions.ACTIVATE, ActionStatus.FAILED,
+                    null, "In-exist token: "+token);
+            modelAndView.addObject("error", "Token is invalid.");
+        }
+
+        User user = verificationToken.getUser();
+        Calendar cal = Calendar.getInstance();
+        Date date = verificationToken.getExpiryDate();
+        if (date==null || (date.getTime() - cal.getTime().getTime()) <= 0) {
+            addAudit(Actions.ACTIVATE, ActionStatus.FAILED,
+                    user.getUserName(), "Expired token: "+token);
+            modelAndView.addObject("error", "Token has expired.");
+        }
+        else
+            modelAndView.addObject("username", user.getUserName());
+
+        return modelAndView;
+    }
+
+    @PostMapping("/setNewPwd")
+    public String setNewPwd(@ModelAttribute LoginDTO loginDto) {
+        String username = loginDto.getUsername();
+        userService.activateUser(username, loginDto.getPassword());
+        addAudit(Actions.ACTIVATE, ActionStatus.SUCCESS,
+                username, "Activation and set new password.");
+        return "redirect:/login";
     }
 
 
@@ -191,6 +237,11 @@ public class UserController {
         userService.resetPassword(userId);
         addAudit(Actions.FORGOT_PWD, ActionStatus.SUCCESS,
                 userService.findUserNameByID(userId), "Reset password via email.");
+
+        // Generate event to send activation email.
+        eventPublisher.publishEvent(
+                new OnRegistrationCompleteEvent(userService.findById(userId), ""));
+
         return "redirect:/";
     }
 

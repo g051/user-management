@@ -3,6 +3,8 @@ package com.user.mngmnt.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.user.mngmnt.model.VerificationToken;
+import com.user.mngmnt.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private VerificationTokenRepository tokenRepository;
+
     @Value("${user.password.default}")
     private String defPwd;
 
@@ -39,19 +44,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(User user) {
-        if (user.getId() == null) {
+        if (user.getId() == null)
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            user.setActive(Boolean.TRUE);
-        }
+
         userRepository.save(user);
         System.out.println("Save user: "+user);
     }
 
     @Override
-    public void activateUser(String userName) {
-        User user = userRepository.findByUserName(userName);
-        user.setActive(Boolean.TRUE);
-        userRepository.save(user);
+    public void activateUser(String username, String password) {
+        User user = userRepository.findByUserName(username);
+        if(user!=null) {
+            user.setPassword(bCryptPasswordEncoder.encode(password));
+            user.setActive(Boolean.TRUE);
+            userRepository.save(user);
+        }
     }
 
     @Override
@@ -122,4 +129,14 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public VerificationToken getVerificationToken(String VerificationToken) {
+        return tokenRepository.findByToken(VerificationToken);
+    }
+
+    @Override
+    public void createVerificationToken(User user, String token) {
+        VerificationToken myToken = new VerificationToken(token, user);
+        tokenRepository.save(myToken);
+    }
 }

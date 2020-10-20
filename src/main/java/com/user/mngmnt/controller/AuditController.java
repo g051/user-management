@@ -47,8 +47,6 @@ public class AuditController {
             list.add(e.getAuthority());
         });
 
-        System.out.println("Inside AuditController.listAudit() called by: "+ request.getRequestURI());
-
         if(size<maxResults)
             size = maxResults;
         String userName = ((User)request.getSession().getAttribute("currentUser")).getUserName();
