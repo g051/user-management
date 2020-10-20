@@ -1,19 +1,23 @@
 package com.user.mngmnt;
 
-import com.user.mngmnt.model.RoleNames;
-import com.user.mngmnt.model.User;
+import com.user.mngmnt.model.*;
+import com.user.mngmnt.service.AuditService;
 import com.user.mngmnt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
 
 @Component
 public class InitialSetup {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuditService auditService;
 
     @Value("${admin.username}")
     private String userName;
@@ -48,6 +52,7 @@ public class InitialSetup {
             userService.saveUser(user);
         }
         loadUsers();
+        //loadAudits();
     }
 
 
@@ -64,5 +69,23 @@ public class InitialSetup {
         User user3 = new User("user3", "3", "User",
                 "user3@yopmail.com", "123456", RoleNames.USER.name(), Boolean.TRUE);
         userService.saveUser(user3);
+    }
+
+    private void loadAudits() {
+        Audit audit0 = new Audit(userName, Actions.LOGIN.name(), ActionStatus.SUCCESS.name(),
+                userName,"Admin login", LocalDateTime.now());
+        auditService.saveAudit(audit0);
+
+        Audit audit1 = new Audit(userName, Actions.RESISTER.name(), ActionStatus.FAILED.name(),
+                "user1","Create new user", LocalDateTime.now());
+        auditService.saveAudit(audit1);
+
+        Audit audit2 = new Audit("user1", Actions.ACTIVATE.name(), ActionStatus.SUCCESS.name(),
+                "user1","Account is activated", LocalDateTime.now());
+        auditService.saveAudit(audit2);
+
+        Audit audit3 = new Audit("user2", Actions.FORGOT_PWD.name(), ActionStatus.FAILED.name(),
+                "user2","Reset password", LocalDateTime.now());
+        auditService.saveAudit(audit3);
     }
 }

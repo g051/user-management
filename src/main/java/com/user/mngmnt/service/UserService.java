@@ -26,6 +26,8 @@ public interface UserService {
 
     User findById(Long id);
 
+    String findUserNameByID(Long id);
+
     Page<User> searchByTerm(String name, Pageable pageable);
 
     Page<User> listUsers(Pageable pageable);

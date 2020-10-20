@@ -3,17 +3,18 @@ package com.user.mngmnt.controller;
 import com.user.mngmnt.constants.AppConstant;
 import com.user.mngmnt.dto.Response;
 import com.user.mngmnt.dto.SearchDTO;
-import com.user.mngmnt.model.Password;
-import com.user.mngmnt.model.RoleNames;
-import com.user.mngmnt.model.User;
+import com.user.mngmnt.model.*;
+import com.user.mngmnt.service.AuditService;
 import com.user.mngmnt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sound.midi.Soundbank;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,12 +33,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuditService auditService;
+
     @Value("${max.result.per.page}")
     private int maxResults;
 
     @Value("${max.card.display.on.pagination.tray}")
     private int maxPaginationTraySize;
-
 
 
     @GetMapping("/")
@@ -57,13 +60,23 @@ public class UserController {
             modelAndView.setViewName("home");
             Page<User> allUsers = userService.listUsers(PageRequest.of(page, size, Sort.by("userName")));
             modelAndView.addObject("allUsers", allUsers);
+            if(size<maxResults)
+                size = maxResults;
             modelAndView.addObject("maxTraySize", size);
             modelAndView.addObject("currentPage", page);
         } else {
             modelAndView.setViewName("user-home");
         }
-        User user = userService.findUserByUserName(request.getUserPrincipal().getName());
+        //User user = userService.findUserByUserName(request.getUserPrincipal().getName());
+        String userName = getCurrentUserName();
+        User user = userService.findUserByUserName(userName);
         modelAndView.addObject("currentUser", user);
+
+        if(request.getHeader(HttpHeaders.REFERER).contains("/login")
+                || request.getSession().getAttribute("currentUser")==null)
+            addAudit(Actions.LOGIN, ActionStatus.SUCCESS,
+                    userName, "Login successfully.");
+
         request.getSession().setAttribute("currentUser", user);
 
         return modelAndView;
@@ -76,8 +89,14 @@ public class UserController {
                                      @RequestParam(value = "searchTerm", required = false) String searchTerm) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("home");
-        Page<User> allUsers = userService.searchByTerm(searchTerm.trim(), PageRequest.of(page, size, Sort.by("userName")));
+        Page<User> allUsers = userService.searchByTerm(searchTerm.trim(),
+                PageRequest.of(page, size, Sort.by("userName")));
+        addAudit(Actions.SEARCH, (allUsers==null?ActionStatus.FAILED:ActionStatus.SUCCESS),
+                null, "Quick search by term: "+searchTerm.trim());
+
         modelAndView.addObject("allUsers", allUsers);
+        if(size<maxResults)
+            size = maxResults;
         modelAndView.addObject("maxTraySize", size);
         modelAndView.addObject("currentPage", page);
         return modelAndView;
@@ -95,6 +114,10 @@ public class UserController {
     @PostMapping("/searchSubmit")
     public ModelAndView searchSubmit(@ModelAttribute SearchDTO searchDto) {
         List<User> result = userService.searchBy(searchDto.getSearchKeyword(), searchDto.getCriteria());
+        addAudit(Actions.SEARCH,
+                (result==null?ActionStatus.FAILED:ActionStatus.SUCCESS),
+                null,
+                "Advance search: "+searchDto.getCriteria()+"="+searchDto.getSearchKeyword());
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("search");
         modelAndView.addObject("result", result);
@@ -119,9 +142,12 @@ public class UserController {
         dbUser.setLastName(user.getLastName());
         dbUser.setEmail(user.getEmail());
         userService.saveUser(dbUser);
+
+        addAudit(Actions.UPDATE_EMAIL, ActionStatus.SUCCESS,
+                dbUser.getUserName(), "Update email to "+user.getEmail());
+
         return new Response(302, AppConstant.SUCCESS, "/");
     }
-
 
 
     @PostMapping("/register")
@@ -139,6 +165,8 @@ public class UserController {
         }
         if (dbUser == null) {
             userService.saveUser(user);
+            addAudit(Actions.RESISTER, ActionStatus.SUCCESS,
+                    user.getUserName(), "Register new user account.");
         } else {
             result = "redirect:/addNewUser?error=User Already Exists!";
         }
@@ -149,7 +177,11 @@ public class UserController {
 
     @GetMapping("/delete/{userId}")
     public String delete(@PathVariable Long userId) {
-        userService.removeById(userId);
+        if(userId!=null) {
+            addAudit(Actions.DELETE, ActionStatus.SUCCESS,
+                    userService.findUserNameByID(userId), "Delete user account.");
+            userService.removeById(userId);
+        }
         return "redirect:/";
     }
 
@@ -157,6 +189,8 @@ public class UserController {
     @GetMapping("/resetPwd/{userId}")
     public String resetPwd(@PathVariable Long userId) {
         userService.resetPassword(userId);
+        addAudit(Actions.FORGOT_PWD, ActionStatus.SUCCESS,
+                userService.findUserNameByID(userId), "Reset password via email.");
         return "redirect:/";
     }
 
@@ -184,6 +218,8 @@ public class UserController {
             result = "redirect:/updatePwd?error=Enter valid new password";
         } else {
             userService.updatePassword(userName, oldPwd, newPwd);
+            addAudit(Actions.UPDATE_PWD, ActionStatus.SUCCESS,
+                    userName, "Update password after login.");
         }
 
         return result;
@@ -192,6 +228,8 @@ public class UserController {
     @ResponseBody
     @GetMapping("/removeAll")
     public Boolean removeAll() {
+        addAudit(Actions.DELETE_ALL, ActionStatus.SUCCESS,
+                "All users", "Delete all user accounts.");
         return userService.removeAll();
     }
 
@@ -213,5 +251,24 @@ public class UserController {
 
     private boolean isNullOrEmpty(String in) {
         return (in==null || in.trim().isEmpty());
+    }
+
+    private String getCurrentUserName() {
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof UserDetails)
+            userName = ((UserDetails)principal).getUsername();
+        else
+            userName = principal.toString();
+
+        return userName;
+    }
+
+    private void addAudit(Actions action, ActionStatus status, String target, String info) {
+        String actor = getCurrentUserName();
+        Audit audit = new Audit(
+                actor, action.name(), status.name(),
+                target, info, LocalDateTime.now());
+        auditService.saveAudit(audit);
     }
 }

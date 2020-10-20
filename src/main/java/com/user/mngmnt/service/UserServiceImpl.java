@@ -102,6 +102,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    public String findUserNameByID(Long id) {
+        return findById(id).getUserName();
+    }
+
+
+    @Override
     public List<User> searchBy(String keyword, String criteria) {
         if ("userName".equals(criteria)) {
             return userRepository.findByUserNameContaining(keyword);

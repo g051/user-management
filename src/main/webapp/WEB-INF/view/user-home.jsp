@@ -6,7 +6,7 @@
 </head>
 
 <body class="my-login-page">
-<jsp:include page="templates/userHeader.jsp"/>
+<jsp:include page="templates/header.jsp"/>
 <section class="">
     <div class="container ">
         <div class="row justify-content-md-center">
