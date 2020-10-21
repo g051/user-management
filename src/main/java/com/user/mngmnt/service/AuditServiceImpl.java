@@ -32,7 +32,7 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public void saveAudit(Audit audit) {
         auditRepository.save(audit);
-        System.out.println("Save audit: "+audit);
+        System.out.println("Save: "+audit);
     }
 
 

@@ -9,10 +9,8 @@ import com.user.mngmnt.service.AuditService;
 import com.user.mngmnt.service.OnRegistrationCompleteEvent;
 import com.user.mngmnt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,7 +19,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -79,8 +76,8 @@ public class UserController {
         User user = userService.findUserByUserName(userName);
         modelAndView.addObject("currentUser", user);
 
-        if(request.getHeader(HttpHeaders.REFERER).contains("/login")
-                || request.getSession().getAttribute("currentUser")==null)
+        if (request.getSession().getAttribute("currentUser") == null
+            || request.getHeader(HttpHeaders.REFERER).contains("/login"))
             addAudit(Actions.LOGIN, ActionStatus.SUCCESS,
                     userName, "Login successfully.");
 
@@ -161,12 +158,12 @@ public class UserController {
     public String register(@ModelAttribute User user, HttpServletRequest request) {
         String result = "redirect:/";
         User dbUser = userService.findUserByUserName(user.getUserName());
-        if (user.getUserName() == null || user.getUserName().trim().isEmpty()) {
+        if (isNullOrEmpty(user.getUserName())) {
             result = "redirect:/addNewUser?error=Enter valid username";
-        } else if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+        } else if (isNullOrEmpty(user.getEmail())) {
             result = "redirect:/addNewUser?error=Enter valid email";
-        } else if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
-            result = "redirect:/addNewUser?error=Enter valid password";
+        //} else if (isNullOrEmpty(user.getPassword())) {
+        //    result = "redirect:/addNewUser?error=Enter valid password";
         } else if (StringUtils.isEmpty(user.getRoleName())) {
             result = "redirect:/addNewUser?error=Select a valid Role";
         }

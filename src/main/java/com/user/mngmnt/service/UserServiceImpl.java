@@ -44,11 +44,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(User user) {
-        if (user.getId() == null)
+        if (user.getId()==null && user.getPassword()!=null)
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
         userRepository.save(user);
-        System.out.println("Save user: "+user);
+        System.out.println("Save: "+user);
     }
 
     @Override
@@ -58,6 +58,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(bCryptPasswordEncoder.encode(password));
             user.setActive(Boolean.TRUE);
             userRepository.save(user);
+            System.out.println("Activate: "+user);
         }
     }
 
